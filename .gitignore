@@ -34,3 +34,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# study materials
+*.pdf
+
+# backend
+backend/__pycache__/
+backend/.env
+backend/*.log
+backend/*.txt
+!backend/requirements.txt

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, use } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useSessionStore } from "@/stores/sessionStore";
@@ -26,9 +26,9 @@ const SPEED_OPTIONS = [0.75, 1.0, 1.25] as const;
 export default function SessionPage({
   params,
 }: {
-  params: Promise<{ documentId: string }>;
+  params: { documentId: string };
 }) {
-  const { documentId } = use(params);
+  const { documentId } = params;
   const router = useRouter();
   const supabase = createClient();
   const store = useSessionStore();
@@ -39,7 +39,10 @@ export default function SessionPage({
 
   // Load session data
   useEffect(() => {
+    if (store.status !== "idle") return;
+
     async function initSession() {
+      setLoading(true);
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/auth/login"); return; }
 
@@ -132,7 +135,7 @@ export default function SessionPage({
     initSession();
 
     return () => { stopSpeech(); };
-  }, [documentId]);
+  }, [documentId, store.status, router, supabase, store]);
 
   // Spacebar handler
   useEffect(() => {
@@ -150,7 +153,7 @@ export default function SessionPage({
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [store]);
 
   const currentQuestion = store.questions[store.currentIndex];
 
@@ -284,7 +287,6 @@ export default function SessionPage({
       <SessionEndView
         questionsAnswered={store.questionsAnswered}
         questionsPlanned={store.questionsPlanned}
-        documentId={documentId}
         sessionId={store.sessionId!}
       />
     );
@@ -586,12 +588,10 @@ export default function SessionPage({
 function SessionEndView({
   questionsAnswered,
   questionsPlanned,
-  documentId,
   sessionId,
 }: {
   questionsAnswered: number;
   questionsPlanned: number;
-  documentId: string;
   sessionId: string;
 }) {
   const router = useRouter();
@@ -640,9 +640,8 @@ function SessionEndView({
   const handleKeepGoing = useCallback(async () => {
     setExtending(true);
     store.resetSession();
-    router.push(`/session/${documentId}`);
-    router.refresh();
-  }, [documentId, router, store]);
+    // No need for router.push/refresh, useEffect will trigger on store.status change
+  }, [store]);
 
   return (
     <div style={{
