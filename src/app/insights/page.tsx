@@ -5,46 +5,6 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import InsightsLoading from "./loading";
 
-function CircularProgress({ value, max, color, label }: { value: number, max: number, color: string, label: string }) {
-  const radius = 36;
-  const circumference = 2 * Math.PI * radius;
-  const percentage = max === 0 ? 0 : value / max;
-  const [offset, setOffset] = useState(circumference);
-
-  useEffect(() => {
-    // animate in
-    const timer = setTimeout(() => {
-      setOffset(circumference - percentage * circumference);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [percentage, circumference]);
-
-  return (
-    <div className="glass-card" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "1.5rem" }}>
-      <div style={{ position: "relative", width: "96px", height: "96px", marginBottom: "1rem" }}>
-        <svg fill="none" viewBox="0 0 96 96" style={{ transform: "rotate(-90deg)", width: "100%", height: "100%" }}>
-          <circle cx="48" cy="48" r={radius} stroke="var(--color-outline-variant)" strokeWidth="8" />
-          <circle
-            cx="48" cy="48" r={radius} stroke={color} strokeWidth="8"
-            strokeDasharray={circumference} strokeDashoffset={offset}
-            strokeLinecap="round"
-            style={{ transition: "stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)" }}
-          />
-        </svg>
-        <div style={{
-          position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontFamily: "var(--font-headline)", fontSize: "1.75rem", fontWeight: 700, color: "var(--color-on-surface)"
-        }}>
-          {value}
-        </div>
-      </div>
-      <div className="text-label-md" style={{ color: "var(--color-on-surface-variant)" }}>
-        {label}
-      </div>
-    </div>
-  );
-}
 
 interface ConceptInsight {
   label: string;
@@ -107,47 +67,126 @@ export default function InsightsPage() {
       maxWidth: "720px", margin: "0 auto", padding: "2rem",
       minHeight: "calc(100dvh - 5rem)",
     }}>
-      <h1 className="text-headline-md" style={{ marginBottom: "2rem" }}>
+      {/* Header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
+        <h1 style={{ fontFamily: "var(--font-headline)", fontSize: "1.35rem", color: "var(--color-primary-bright)", fontWeight: 700, letterSpacing: "0.5px" }}>
+          Aether
+        </h1>
+        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dim)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: "pointer" }}>
+            <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>
+          </svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dim)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: "pointer" }}>
+            <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          <div style={{
+            width: "32px", height: "32px", borderRadius: "50%",
+            backgroundColor: "rgba(255,255,255,0.05)",
+            display: "flex", alignItems: "center", justifyContent: "center"
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--color-on-surface-variant)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <p style={{
+        fontFamily: "var(--font-label)", fontSize: "0.6875rem", letterSpacing: "2px",
+        fontWeight: 700, color: "#9CA3FF", textTransform: "uppercase", marginBottom: "0.5rem"
+      }}>
+        Performance Overview
+      </p>
+      <h1 className="text-headline-md" style={{ fontSize: "2.25rem", letterSpacing: "-0.01em", marginBottom: "3rem" }}>
         Insights
       </h1>
 
       {/* Summary cards */}
-      {/* Summary cards */}
       <div style={{
         display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
-        gap: "1.25rem", marginBottom: "2.5rem",
+        gap: "1.25rem", marginBottom: "4rem",
       }}>
-        <CircularProgress value={counts.high} max={insights.length} color="var(--color-success)" label="Strong" />
-        <CircularProgress value={counts.medium} max={insights.length} color="var(--color-primary-bright)" label="Developing" />
-        <CircularProgress value={counts.low} max={insights.length} color="var(--color-error)" label="Needs review" />
+        {/* Strong Card */}
+        <div style={{ backgroundColor: "rgba(22, 23, 30, 0.7)", borderRadius: "16px", padding: "2rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+           <span style={{ fontFamily: "var(--font-headline)", fontSize: "2.5rem", color: "#9CA3FF", fontWeight: 500, lineHeight: 1 }}>
+             {counts.high}
+           </span>
+           <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", letterSpacing: "1.5px", fontWeight: 700, color: "var(--color-primary-dim)", marginTop: "1rem", textTransform: "uppercase" }}>
+             Strong
+           </span>
+           <div style={{ width: "24px", height: "2px", backgroundColor: "#9CA3FF", marginTop: "0.75rem", borderRadius: "2px" }} />
+        </div>
+
+        {/* Developing Card */}
+        <div style={{ backgroundColor: "rgba(22, 23, 30, 0.7)", borderRadius: "16px", padding: "2rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+           <span style={{ fontFamily: "var(--font-headline)", fontSize: "2.5rem", color: "#C084FC", fontWeight: 500, lineHeight: 1 }}>
+             {counts.medium}
+           </span>
+           <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", letterSpacing: "1.5px", fontWeight: 700, color: "var(--color-primary-dim)", marginTop: "1rem", textTransform: "uppercase" }}>
+             Developing
+           </span>
+           <div style={{ width: "24px", height: "2px", backgroundColor: "#C084FC", marginTop: "0.75rem", borderRadius: "2px" }} />
+        </div>
+
+        {/* Needs Review Card */}
+        <div style={{ backgroundColor: "rgba(22, 23, 30, 0.7)", borderRadius: "16px", padding: "2rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
+           <span style={{ fontFamily: "var(--font-headline)", fontSize: "2.5rem", color: "#FB7185", fontWeight: 500, lineHeight: 1 }}>
+             {counts.low}
+           </span>
+           <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", letterSpacing: "1.5px", fontWeight: 700, color: "var(--color-primary-dim)", marginTop: "1rem", textTransform: "uppercase" }}>
+             Needs Review
+           </span>
+           <div style={{ width: "24px", height: "2px", backgroundColor: "#FB7185", marginTop: "0.75rem", borderRadius: "2px" }} />
+        </div>
       </div>
 
       {/* Filter */}
       <div style={{
-        display: "flex", gap: "0.5rem", marginBottom: "1.5rem",
+        display: "flex", justifyContent: "center", marginBottom: "2.5rem"
       }}>
-        {(["all", "high", "medium", "low"] as const).map((f) => (
-          <button
-            key={f}
-            className={filter === f ? "btn-primary" : "btn-secondary"}
-            onClick={() => setFilter(f)}
-            style={{ fontSize: "0.75rem", padding: "0.4rem 0.75rem", textTransform: "capitalize" }}
-          >
-            {f}
-          </button>
-        ))}
+        <div style={{
+          display: "inline-flex", gap: "0.25rem", backgroundColor: "rgba(22, 23, 30, 0.8)",
+          padding: "0.375rem", borderRadius: "99px"
+        }}>
+          {(["all", "high", "medium", "low"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              style={{
+                fontSize: "0.8125rem", padding: "0.5rem 1.25rem", textTransform: "capitalize",
+                fontWeight: 600, borderRadius: "99px",
+                backgroundColor: filter === f ? "#9CA3FF" : "transparent",
+                color: filter === f ? "#111122" : "var(--color-secondary-text)",
+                border: "none", cursor: "pointer",
+                transition: "all 200ms ease"
+              }}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Concept list */}
+      {/* Concept list / Empty State */}
       {filtered.length === 0 ? (
-        <p className="text-body-lg" style={{
-          textAlign: "center", padding: "3rem",
-          color: "var(--color-on-surface-variant)",
+        <div style={{
+          textAlign: "center", padding: "4rem 2rem",
+          display: "flex", flexDirection: "column", alignItems: "center", justifyItems: "center"
         }}>
-          {insights.length === 0
-            ? "Complete a session to see your insights"
-            : "No concepts in this category"}
-        </p>
+          <div style={{ width: "64px", height: "64px", borderRadius: "50%", backgroundColor: "rgba(35, 35, 45, 0.4)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "1.5rem" }}>
+             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-on-surface-variant)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="8" y1="12" x2="8" y2="16"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="16" y1="14" x2="16" y2="16"/>
+             </svg>
+          </div>
+          <h4 style={{ fontFamily: "var(--font-headline)", fontSize: "1.125rem", color: "var(--color-on-surface)", fontWeight: 600, marginBottom: "0.75rem" }}>
+            No Data Found
+          </h4>
+          <p className="text-body-md" style={{ color: "var(--color-secondary-text)", maxWidth: "340px", lineHeight: 1.6 }}>
+            {insights.length === 0
+              ? "Complete a session to see your insights and begin tracking your progress within the atelier."
+              : "No concepts found in this particular tier."}
+          </p>
+        </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
           {filtered.map((insight, i) => (

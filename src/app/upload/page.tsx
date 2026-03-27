@@ -187,185 +187,214 @@ export default function UploadPage() {
   const isProcessing = ["extracting", "uploading", "processing"].includes(status);
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        minHeight: "calc(100dvh - 5rem)",
-        padding: "2rem",
-      }}
-    >
-      <div style={{ width: "100%", maxWidth: "560px" }}>
-        <h1
-          className="text-headline-md"
-          style={{
-            textAlign: "center",
-            marginBottom: "0.5rem",
-            color: "var(--color-on-surface)",
-          }}
-        >
+    <div style={{
+      maxWidth: "960px",
+      margin: "0 auto",
+      padding: "2rem",
+      paddingBottom: "100px", // breathing room for BottomNav
+      minHeight: "calc(100dvh - 5rem)",
+    }}>
+      {/* Header */}
+      <h1 style={{
+        fontFamily: "var(--font-headline)", fontSize: "1.35rem",
+        color: "var(--color-primary-bright)", fontWeight: 700, letterSpacing: "0.5px"
+      }}>
+        Aether
+      </h1>
+
+      {/* Hero Text */}
+      <div style={{ textAlign: "center", marginTop: "4rem", marginBottom: "3rem" }}>
+        <h2 style={{
+          fontFamily: "var(--font-headline)", fontSize: "2.75rem",
+          fontWeight: 500, color: "var(--color-on-surface)", letterSpacing: "-0.02em"
+        }}>
           Upload a document
-        </h1>
-        <p
-          className="text-body-lg"
-          style={{
-            textAlign: "center",
-            color: "var(--color-on-surface-variant)",
-            marginBottom: "2rem",
-          }}
-        >
-          Drop a PDF and Aether will build your course
+        </h2>
+        <p style={{ color: "var(--color-secondary-text)", marginTop: "0.75rem", fontSize: "1.125rem" }}>
+          Drop a PDF and Aether will build your course.
         </p>
+      </div>
 
-        <button
-          id="upload-drop-zone"
-          onClick={() => fileInputRef.current?.click()}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-          disabled={isProcessing}
-          className="glass-panel"
-          style={{
-            position: "relative",
-            width: "100%",
-            minHeight: "260px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: "1.25rem",
-            padding: "2rem",
-            overflow: "hidden",
-            backgroundColor: isDragging
-              ? "rgba(129, 140, 248, 0.08)"
-              : "rgba(255, 255, 255, 0.02)",
-            boxShadow: isDragging 
-              ? "0 0 40px -10px rgba(129, 140, 248, 0.5), inset 0 0 20px rgba(129, 140, 248, 0.1)" 
-              : "0 8px 32px -4px rgba(0, 0, 0, 0.1)",
-            border: `1px solid ${
-              isDragging
-                ? "rgba(129, 140, 248, 0.6)"
-                : status === "error" || status === "unsupported"
-                ? "var(--color-error)"
-                : "rgba(255, 255, 255, 0.08)"
-            }`,
-            cursor: isProcessing ? "wait" : "pointer",
-          }}
-        >
-          {isProcessing && (
+      {/* Main Dropzone Box */}
+      <button
+        id="upload-drop-zone"
+        onClick={() => fileInputRef.current?.click()}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onDrop={handleDrop}
+        disabled={isProcessing}
+        style={{
+          position: "relative",
+          width: "100%",
+          minHeight: "360px",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "1.5rem",
+          padding: "3rem",
+          overflow: "hidden",
+          borderRadius: "24px",
+          backgroundColor: isDragging
+            ? "rgba(129, 140, 248, 0.12)"
+            : "rgba(22, 23, 30, 0.8)", // Deep navy surface variant
+          boxShadow: isDragging 
+            ? "0 0 50px -10px rgba(129, 140, 248, 0.3), inset 0 0 0 2px rgba(129, 140, 248, 0.5)" 
+            : "0 12px 40px -10px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.05)",
+          border: "none", // Using inset shadows instead of harsh borders
+          cursor: isProcessing ? "wait" : "pointer",
+          transition: "all 250ms ease"
+        }}
+        onMouseOver={(e) => {
+          if (!isDragging && !isProcessing) {
+            e.currentTarget.style.backgroundColor = "rgba(30, 31, 40, 0.9)";
+            e.currentTarget.style.transform = "translateY(-2px)";
+          }
+        }}
+        onMouseOut={(e) => {
+          if (!isDragging && !isProcessing) {
+            e.currentTarget.style.backgroundColor = "rgba(22, 23, 30, 0.8)";
+            e.currentTarget.style.transform = "translateY(0)";
+          }
+        }}
+      >
+        {isProcessing && (
+          <div style={{
+            position: "absolute", top: 0, left: 0, width: "100%", height: "4px",
+            backgroundColor: "rgba(255, 255, 255, 0.05)", zIndex: 10
+          }}>
+            <div className="progress-slide" style={{
+              height: "100%", backgroundColor: "var(--color-primary-bright)",
+              boxShadow: "0 0 10px var(--color-primary-bright)"
+            }} />
+          </div>
+        )}
+
+        {isProcessing ? (
+          <>
             <div style={{
-              position: "absolute", top: 0, left: 0, width: "100%", height: "2px",
-              backgroundColor: "rgba(255, 255, 255, 0.05)", zIndex: 10
+              width: "64px", height: "64px", borderRadius: "16px",
+              backgroundColor: "rgba(129, 140, 248, 0.15)", color: "var(--color-primary-bright)",
+              display: "flex", alignItems: "center", justifyContent: "center"
             }}>
-              <div className="progress-slide" style={{
-                height: "100%", backgroundColor: "var(--color-primary)",
-              }} />
+               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" className="aether-pulse">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
             </div>
-          )}
-
-          {isProcessing ? (
-            <>
-              <p
-                className="text-body-lg"
-                style={{ color: "var(--color-on-surface)" }}
-              >
-                Processing document…
+            <div>
+              <p style={{ fontFamily: "var(--font-headline)", fontSize: "1.25rem", color: "var(--color-on-surface)", fontWeight: 600 }}>
+                Processing document...
               </p>
               {file && (
-                <p
-                  className="text-label-md"
-                  style={{ color: "var(--color-secondary-text)" }}
-                >
-                  {file.name}
+                <p style={{ color: "var(--color-primary-bright)", marginTop: "0.25rem", fontSize: "0.9375rem" }}>
+                  {file?.name}
                 </p>
               )}
-            </>
-          ) : status === "error" || status === "unsupported" ? (
-            <>
-              <svg
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="var(--color-error)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+            </div>
+          </>
+        ) : status === "error" || status === "unsupported" ? (
+          <>
+            <div style={{
+              width: "64px", height: "64px", borderRadius: "16px",
+              backgroundColor: "rgba(225, 29, 72, 0.15)", color: "#FB7185",
+              display: "flex", alignItems: "center", justifyContent: "center"
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
                 <line x1="15" y1="9" x2="9" y2="15" />
                 <line x1="9" y1="9" x2="15" y2="15" />
               </svg>
-              <p
-                className="text-body-lg"
-                style={{
-                  color: "var(--color-error)",
-                  maxWidth: "360px",
-                  wordBreak: "break-word",
-                  overflowWrap: "anywhere",
-                  whiteSpace: "pre-wrap",
-                  lineHeight: 1.4,
-                  fontSize: "0.875rem",
-                }}
-              >
+            </div>
+            <div style={{ maxWidth: "400px", textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-headline)", fontSize: "1.125rem", color: "#FB7185", fontWeight: 600, marginBottom: "0.5rem" }}>
+                Upload Failed
+              </p>
+              <p style={{ color: "var(--color-secondary-text)", lineHeight: 1.5, fontSize: "0.875rem" }}>
                 {errorMessage}
               </p>
-              <button
-                className="btn-secondary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setStatus("idle");
-                  setFile(null);
-                  setErrorMessage(null);
-                }}
-                style={{ marginTop: "0.5rem" }}
-              >
-                Try another file
-              </button>
-            </>
-          ) : (
-            <>
-              <svg
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="var(--color-primary)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="17 8 12 3 7 8" />
-                <line x1="12" y1="3" x2="12" y2="15" />
+            </div>
+            <button
+              className="btn-secondary"
+              onClick={(e) => {
+                e.stopPropagation();
+                setStatus("idle");
+                setFile(null);
+                setErrorMessage(null);
+              }}
+              style={{ marginTop: "0.5rem", borderRadius: "99px", padding: "0.5rem 1.5rem" }}
+            >
+              Try another file
+            </button>
+          </>
+        ) : (
+          <>
+            {/* Custom File Icon Wrapper */}
+            <div style={{
+              width: "72px", height: "72px", borderRadius: "50%",
+              backgroundColor: "rgba(156, 163, 255, 0.08)", color: "#9CA3FF",
+              display: "flex", alignItems: "center", justifyContent: "center"
+            }}>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm-1 13v4h-2v-4H8l4-4 4 4h-3zm-3-6V3.5L18.5 9H10z" />
               </svg>
-              <p
-                className="text-body-lg"
-                style={{ color: "var(--color-on-surface-variant)" }}
-              >
+            </div>
+            <div style={{ textAlign: "center" }}>
+              <p style={{ fontFamily: "var(--font-headline)", fontSize: "1.25rem", fontWeight: 600, color: "var(--color-on-surface)" }}>
                 Drag & drop a PDF here
               </p>
-              <p
-                className="text-label-md"
-                style={{ color: "var(--color-secondary-text)" }}
-              >
-                or click to browse · Max {MAX_FILE_SIZE_MB}MB
+              <p style={{ color: "var(--color-primary-dim)", marginTop: "0.5rem", fontSize: "0.75rem", letterSpacing: "1px", fontWeight: 700, textTransform: "uppercase" }}>
+                Or click to browse · Max {MAX_FILE_SIZE_MB}MB
               </p>
-            </>
-          )}
-        </button>
+            </div>
+          </>
+        )}
 
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".pdf,application/pdf"
-          onChange={handleInputChange}
-          style={{ display: "none" }}
-          id="upload-file-input"
-        />
+        {/* Triple Dot Decoration */}
+        <div style={{ position: "absolute", bottom: "1.5rem", right: "2rem", display: "flex", gap: "0.25rem", opacity: 0.3 }}>
+          <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "var(--color-primary-bright)" }} />
+          <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "var(--color-primary-bright)" }} />
+          <div style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: "var(--color-primary-bright)" }} />
+        </div>
+      </button>
+
+      {/* Info Columns via CSS Grid */}
+      <div style={{
+        marginTop: "1.5rem",
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+        gap: "1.5rem",
+      }}>
+        <div style={{ backgroundColor: "rgba(22, 23, 30, 0.5)", borderRadius: "16px", padding: "1.5rem" }}>
+          <h4 style={{ color: "#C084FC", fontSize: "0.75rem", letterSpacing: "1px", fontWeight: 700, textTransform: "uppercase", marginBottom: "0.75rem" }}>Tip</h4>
+          <p style={{ color: "var(--color-secondary-text)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+            Better course structures are built from documents with clear headings.
+          </p>
+        </div>
+        <div style={{ backgroundColor: "rgba(22, 23, 30, 0.5)", borderRadius: "16px", padding: "1.5rem" }}>
+          <h4 style={{ color: "#9CA3FF", fontSize: "0.75rem", letterSpacing: "1px", fontWeight: 700, textTransform: "uppercase", marginBottom: "0.75rem" }}>Recent</h4>
+          <p style={{ color: "var(--color-secondary-text)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+            Continue with <br/> <span style={{ color: "var(--color-on-surface)", fontWeight: 500 }}>&apos;Neuroscience_Intro.pdf&apos;</span> <br/>
+            uploaded 2h ago.
+          </p>
+        </div>
+        <div style={{ backgroundColor: "rgba(22, 23, 30, 0.5)", borderRadius: "16px", padding: "1.5rem" }}>
+          <h4 style={{ color: "#FB7185", fontSize: "0.75rem", letterSpacing: "1px", fontWeight: 700, textTransform: "uppercase", marginBottom: "0.75rem" }}>Aether AI</h4>
+          <p style={{ color: "var(--color-secondary-text)", fontSize: "0.875rem", lineHeight: 1.6 }}>
+            Processing takes ~30 seconds for a standard 50-page document.
+          </p>
+        </div>
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf,application/pdf"
+        onChange={handleInputChange}
+        style={{ display: "none" }}
+        id="upload-file-input"
+      />
     </div>
   );
 }
