@@ -48,7 +48,7 @@ export default function InsightsPage() {
       setLoading(false);
     }
     load();
-  }, []);
+  }, [router, supabase]);
 
   const filtered = filter === "all"
     ? insights

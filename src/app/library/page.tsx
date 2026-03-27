@@ -20,19 +20,28 @@ export default function LibraryPage() {
   const [documents, setDocuments] = useState<DocumentWithProgress[]>([]);
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState<string>("there");
+  const [greeting, setGreeting] = useState("Good morning");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting("Good morning");
+    else if (hour < 18) setGreeting("Good afternoon");
+    else setGreeting("Good evening");
+
     async function loadDocuments() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push("/auth/login"); return; }
 
-      // Extract name from email (e.g., "jane.doe@example.com" -> "Jane Doe" or just "Jane")
-      if (user.email) {
-        const emailName = user.email.split("@")[0];
-        // Capitalize first letter
-        const formattedName = emailName.charAt(0).toUpperCase() + emailName.slice(1).replace(/[^a-zA-Z0-9]/g, ' ');
-        setUserName(formattedName);
+      let name = "there";
+      const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
+      if (metaName) {
+        name = metaName;
+      } else if (user.email) {
+        const emailPrefix = user.email.split("@")[0];
+        name = emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1);
       }
+      setUserName(name);
 
       const { data: docs } = await supabase
         .from("documents")
@@ -65,6 +74,34 @@ export default function LibraryPage() {
     loadDocuments();
   }, [router, supabase]);
 
+  const handleDeleteDocument = async (e: React.MouseEvent, docId: string) => {
+    e.stopPropagation();
+    if (deletingId !== docId) {
+      setDeletingId(docId);
+      return;
+    }
+
+    try {
+      // Clear confirmation state
+      setDeletingId(null);
+      // Optimistic UI update
+      setDocuments(prev => prev.filter(d => d.id !== docId));
+
+      const { error } = await supabase
+        .from("documents")
+        .delete()
+        .eq("id", docId);
+
+      if (error) {
+        console.error("Error deleting document:", error);
+        alert("Failed to delete document. Please try again.");
+        window.location.reload();
+      }
+    } catch (err) {
+      console.error("Failed to delete:", err);
+      alert("An unexpected error occurred.");
+    }
+  };
 
 
   if (loading) return <LibraryLoading />;
@@ -78,7 +115,7 @@ export default function LibraryPage() {
       {/* Hero Section */}
       <div style={{ marginTop: "5.5rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
         <h2 style={{ fontFamily: "var(--font-headline)", fontSize: "2.75rem", fontWeight: 600, color: "var(--color-on-surface)", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
-          Good morning, <span style={{ color: "var(--color-primary-bright)", textShadow: "0 2px 12px rgba(156, 163, 255, 0.2)" }}>{userName}</span>.
+          {greeting}, <span style={{ color: "var(--color-primary-bright)", textShadow: "0 2px 12px rgba(156, 163, 255, 0.2)" }}>{userName}</span>.
         </h2>
         <p style={{ color: "var(--color-secondary-text)", marginTop: "1rem", fontSize: "1.125rem", maxWidth: "400px", lineHeight: 1.5 }}>
           What would you like to focus on today?
@@ -216,8 +253,50 @@ export default function LibraryPage() {
                     </div>
                   </div>
 
+                  {/* Delete Button */}
+                  <div 
+                    onClick={(e) => handleDeleteDocument(e, doc.id)}
+                    style={{
+                      padding: "0.5rem 1rem",
+                      borderRadius: "12px",
+                      backgroundColor: deletingId === doc.id ? "rgba(239, 68, 68, 0.2)" : "transparent",
+                      color: deletingId === doc.id ? "#ef4444" : "var(--color-on-surface-variant)",
+                      cursor: "pointer",
+                      transition: "all 250ms cubic-bezier(0.34, 1.56, 0.64, 1)",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "0.5rem",
+                      marginLeft: "1rem",
+                      border: deletingId === doc.id ? "1px solid rgba(239, 68, 68, 0.3)" : "1px solid transparent",
+                      fontSize: "0.8125rem",
+                      fontWeight: 700,
+                      fontFamily: "var(--font-label)"
+                    }}
+                    onMouseOver={(e) => {
+                      if (deletingId !== doc.id) {
+                        e.currentTarget.style.backgroundColor = "rgba(239, 68, 68, 0.15)";
+                        e.currentTarget.style.color = "#ef4444";
+                      }
+                    }}
+                    onMouseOut={(e) => {
+                      if (deletingId !== doc.id) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "var(--color-on-surface-variant)";
+                      }
+                    }}
+                  >
+                    {deletingId === doc.id ? (
+                      <>Confirm Delete</>
+                    ) : (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+                      </svg>
+                    )}
+                  </div>
+
                   {/* Chevron Right */}
-                  <div style={{ color: "var(--color-on-surface-variant)" }}>
+                  <div style={{ color: "var(--color-on-surface-variant)", marginLeft: "0.5rem" }}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <polyline points="9 18 15 12 9 6" />
                     </svg>

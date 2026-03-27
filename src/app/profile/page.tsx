@@ -29,6 +29,9 @@ export default function ProfilePage() {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [prefs, setPrefs] = useState<UserPrefs | null>(null);
   const [email, setEmail] = useState("");
+  const [userName, setUserName] = useState("");
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editNameValue, setEditNameValue] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,6 +40,15 @@ export default function ProfilePage() {
       if (!user) { router.push("/auth/login"); return; }
 
       setEmail(user.email ?? "");
+      const metaName = user.user_metadata?.full_name || user.user_metadata?.name;
+      if (metaName) {
+        setUserName(metaName);
+      } else if (user.email) {
+        const emailPrefix = user.email.split("@")[0];
+        setUserName(emailPrefix.charAt(0).toUpperCase() + emailPrefix.slice(1));
+      } else {
+        setUserName("User");
+      }
 
       const [statsRes, prefsRes] = await Promise.all([
         supabase.from("user_stats").select("*").eq("user_id", user.id).single(),
@@ -48,7 +60,7 @@ export default function ProfilePage() {
       setLoading(false);
     }
     load();
-  }, []);
+  }, [router, supabase]);
 
   const updatePref = useCallback(async (field: string, value: string | number) => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -77,6 +89,20 @@ export default function ProfilePage() {
     }
   }, [supabase]);
 
+  const handleSaveName = async () => {
+    const newName = editNameValue.trim();
+    if (!newName) {
+      setIsEditingName(false);
+      return;
+    }
+    setUserName(newName);
+    setIsEditingName(false);
+    
+    await supabase.auth.updateUser({
+      data: { full_name: newName, name: newName }
+    });
+  };
+
   const handleLogout = useCallback(async () => {
     await supabase.auth.signOut();
     router.push("/auth/login");
@@ -102,19 +128,43 @@ export default function ProfilePage() {
             fontWeight: 400, color: "var(--color-on-surface)",
             boxShadow: "0 0 24px -10px rgba(129, 140, 248, 0.4)",
           }}>
-            {email.charAt(0).toUpperCase()}
+            {userName ? userName.charAt(0).toUpperCase() : ""}
           </div>
-          <div style={{
-            position: "absolute", bottom: "0", right: "0",
-            width: "28px", height: "28px", borderRadius: "50%",
-            backgroundColor: "var(--color-surface-variant)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            border: "2px solid var(--color-surface)",
-          }}>
+          <div 
+            onClick={() => { setIsEditingName(true); setEditNameValue(userName); }}
+            style={{
+              position: "absolute", bottom: "0", right: "0",
+              width: "28px", height: "28px", borderRadius: "50%",
+              backgroundColor: "var(--color-surface-variant)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              border: "2px solid var(--color-surface)",
+              cursor: "pointer",
+              transition: "transform 0.2s"
+            }}
+            onMouseOver={(e) => e.currentTarget.style.transform = "scale(1.1)"}
+            onMouseOut={(e) => e.currentTarget.style.transform = "scale(1)"}
+          >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dim)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           </div>
         </div>
-        <h2 style={{ fontFamily: "var(--font-headline)", fontSize: "1.375rem", marginTop: "1rem", fontWeight: 400 }}>Jhanvi Vashishth</h2>
+        {isEditingName ? (
+          <form onSubmit={(e) => { e.preventDefault(); handleSaveName(); }} style={{ marginTop: "1rem" }}>
+            <input 
+              autoFocus
+              value={editNameValue} 
+              onChange={(e) => setEditNameValue(e.target.value)} 
+              onBlur={handleSaveName}
+              style={{
+                fontFamily: "var(--font-headline)", fontSize: "1.375rem", fontWeight: 400,
+                background: "rgba(255,255,255,0.05)", border: "1px solid var(--color-primary-dim)",
+                color: "var(--color-on-surface)", borderRadius: "8px", padding: "4px 8px",
+                width: "250px", outline: "none", textAlign: "center"
+              }}
+            />
+          </form>
+        ) : (
+          <h2 style={{ fontFamily: "var(--font-headline)", fontSize: "1.375rem", marginTop: "1rem", fontWeight: 400 }}>{userName}</h2>
+        )}
         <p style={{ fontFamily: "var(--font-body)", fontSize: "0.875rem", color: "var(--color-secondary-text)", fontWeight: 300, letterSpacing: "0.02em" }}>{email}</p>
       </div>
 
