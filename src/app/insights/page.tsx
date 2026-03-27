@@ -67,12 +67,8 @@ export default function InsightsPage() {
       maxWidth: "720px", margin: "0 auto", padding: "2rem",
       minHeight: "calc(100dvh - 5rem)",
     }}>
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "3rem" }}>
-        <h1 style={{ fontFamily: "var(--font-headline)", fontSize: "1.35rem", color: "var(--color-primary-bright)", fontWeight: 700, letterSpacing: "0.5px" }}>
-          Aether
-        </h1>
-        <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+      {/* Avatar & System Controls */}
+      <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", justifyContent: "flex-end", marginBottom: "3rem" }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dim)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ cursor: "pointer" }}>
             <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>
           </svg>
@@ -88,7 +84,6 @@ export default function InsightsPage() {
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
             </svg>
           </div>
-        </div>
       </div>
 
       <p style={{

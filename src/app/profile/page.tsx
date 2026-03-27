@@ -90,14 +90,6 @@ export default function ProfilePage() {
       maxWidth: "680px", margin: "0 auto", padding: "2rem",
       minHeight: "calc(100dvh - 5rem)",
     }}>
-      {/* Header */}
-      <div style={{
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        marginBottom: "3rem",
-      }}>
-        <h1 style={{ fontFamily: "var(--font-headline)", fontSize: "1.25rem", fontWeight: 600, letterSpacing: "-0.02em" }}>Aether</h1>
-      </div>
-
       {/* User info */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "3rem" }}>
         <div style={{ position: "relative" }}>

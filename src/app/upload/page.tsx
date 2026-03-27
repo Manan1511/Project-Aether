@@ -194,14 +194,6 @@ export default function UploadPage() {
       paddingBottom: "100px", // breathing room for BottomNav
       minHeight: "calc(100dvh - 5rem)",
     }}>
-      {/* Header */}
-      <h1 style={{
-        fontFamily: "var(--font-headline)", fontSize: "1.35rem",
-        color: "var(--color-primary-bright)", fontWeight: 700, letterSpacing: "0.5px"
-      }}>
-        Aether
-      </h1>
-
       {/* Hero Text */}
       <div style={{ textAlign: "center", marginTop: "4rem", marginBottom: "3rem" }}>
         <h2 style={{

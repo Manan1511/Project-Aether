@@ -72,13 +72,18 @@ export default function BottomNav() {
       id="bottom-nav"
       style={{
         position: "fixed",
-        bottom: 0,
-        left: 0,
-        right: 0,
+        bottom: "24px",
+        left: "50%",
+        transform: "translateX(-50%)",
         zIndex: "var(--z-nav)" as string,
-        backgroundColor: "var(--color-surface-container)",
-        borderTop: "1px solid rgba(72, 72, 72, 0.2)",
-        paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        backgroundColor: "rgba(22, 23, 30, 0.75)",
+        backdropFilter: "blur(16px)",
+        WebkitBackdropFilter: "blur(16px)",
+        border: "1px solid rgba(255, 255, 255, 0.08)",
+        borderRadius: "99px",
+        boxShadow: "0 12px 40px rgba(0, 0, 0, 0.4), inset 0 1px 1px rgba(255,255,255,0.05)",
+        padding: "0.25rem 0.5rem",
+        paddingBottom: "calc(0.25rem + env(safe-area-inset-bottom, 0px))",
       }}
     >
       <div
@@ -86,9 +91,9 @@ export default function BottomNav() {
           display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
-          height: "72px",
-          maxWidth: "600px",
-          margin: "0 auto",
+          height: "64px",
+          minWidth: "320px",
+          gap: "0.5rem"
         }}
       >
         {NAV_TABS.map((tab) => {

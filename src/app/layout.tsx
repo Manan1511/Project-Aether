@@ -4,6 +4,7 @@ import BottomNav from "@/components/BottomNav";
 import NavigationProgress from "@/components/NavigationProgress";
 import PageTransition from "@/components/PageTransition";
 import PreferencesProvider from "@/components/PreferencesProvider";
+import GlobalHeader from "@/components/GlobalHeader";
 import "./globals.css";
 
 const inter = Inter({
@@ -34,6 +35,7 @@ export default function RootLayout({
       <body>
         <NavigationProgress />
         <PreferencesProvider>
+          <GlobalHeader />
           <main className="main-content">
             <PageTransition>{children}</PageTransition>
           </main>

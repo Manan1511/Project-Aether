@@ -75,13 +75,6 @@ export default function LibraryPage() {
       minHeight: "calc(100dvh - 5rem)",
       paddingBottom: "100px" // give extra breathing room for BottomNav
     }}>
-      {/* Header */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h1 style={{ fontFamily: "var(--font-headline)", fontSize: "1.35rem", color: "var(--color-primary-bright)", fontWeight: 700, letterSpacing: "0.5px" }}>
-          Aether
-        </h1>
-      </div>
-
       {/* Hero Section */}
       <div style={{ marginTop: "5.5rem", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
         <h2 style={{ fontFamily: "var(--font-headline)", fontSize: "2.75rem", fontWeight: 600, color: "var(--color-on-surface)", letterSpacing: "-0.02em", lineHeight: 1.1 }}>
