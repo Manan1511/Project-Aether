@@ -412,8 +412,8 @@ export default function SessionPage({
           </div>
         )}
 
-        {/* Question card */}
-        <div className="aether-card" style={{ marginBottom: "1.5rem" }}>
+        {/* Question container (Focus Mode: No card background) */}
+        <div style={{ marginBottom: "2rem" }}>
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "center",
             marginBottom: "1rem",
@@ -500,6 +500,7 @@ export default function SessionPage({
                     transition: "all 120ms ease",
                     textAlign: "left",
                     width: "100%",
+                    minHeight: "64px",
                     fontFamily: "var(--font-body)",
                     fontSize: "1rem",
                     color: "var(--color-on-surface)",

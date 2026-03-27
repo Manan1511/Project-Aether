@@ -127,7 +127,12 @@ export default function LibraryPage() {
           </p>
         </div>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+        <div style={{ 
+          display: "grid", 
+          gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", 
+          gap: "1.25rem",
+          alignItems: "stretch"
+        }}>
           {documents.map((doc) => (
             <div
               key={doc.id}
@@ -142,92 +147,129 @@ export default function LibraryPage() {
                   router.push(`/session/${doc.id}`);
                 }
               }}
-              className="aether-card"
+              className={`glass-card group ${doc.status === "processing" ? "aether-pulse" : ""}`}
               style={{
-                display: "flex", justifyContent: "space-between",
-                alignItems: "center", textAlign: "left",
+                position: "relative",
+                display: "flex", 
+                flexDirection: "column",
+                justifyContent: "space-between",
+                textAlign: "left",
                 cursor: doc.status === "ready" ? "pointer" : "default",
-                border: "none", width: "100%", padding: "1rem 1.25rem",
+                width: "100%",
+                minHeight: "180px",
                 opacity: doc.status === "ready" ? 1 : 0.6,
               }}
             >
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
                 <h3 style={{
-                  fontFamily: "var(--font-body)", fontSize: "1.0625rem",
-                  fontWeight: 500, marginBottom: "0.25rem",
-                  color: "var(--color-on-surface)",
+                  fontFamily: "var(--font-headline)", fontSize: "1.25rem",
+                  fontWeight: 600, color: "var(--color-on-surface)",
+                  lineHeight: 1.3,
+                  paddingRight: "2.5rem"
                 }}>
                   {doc.title}
                 </h3>
-                <div style={{
-                  display: "flex", gap: "1rem", alignItems: "center",
-                }}>
-                  <span className="text-label-md" style={{ color: "var(--color-secondary-text)" }}>
-                    {new Date(doc.created_at).toLocaleDateString("en-US", {
-                      month: "short", day: "numeric",
-                    })}
-                  </span>
+                <span className="text-label-md" style={{ color: "var(--color-secondary-text)" }}>
+                  {new Date(doc.created_at).toLocaleDateString("en-US", {
+                    month: "short", day: "numeric", year: "numeric"
+                  })}
+                </span>
+              </div>
+              
+              <div style={{ 
+                display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginTop: "1.5rem" 
+              }}>
+                <div>
                   {doc.status === "ready" && doc.total_concepts > 0 && (
-                    <span className="text-label-md" style={{ color: "var(--color-primary-bright)" }}>
+                    <span className="text-label-md" style={{
+                      backgroundColor: "var(--color-primary-container)",
+                      color: "var(--color-on-primary-container)",
+                      padding: "4px 10px",
+                      borderRadius: "var(--radius-full)",
+                    }}>
                       {doc.concepts_covered} of {doc.total_concepts} concepts
                     </span>
                   )}
                   {doc.status === "processing" && (
-                    <span className="text-label-md" style={{ color: "var(--color-secondary-text)" }}>
+                    <span className="text-label-md" style={{
+                      backgroundColor: "var(--color-secondary-container)",
+                      color: "var(--color-on-surface-variant)",
+                      padding: "4px 10px",
+                      borderRadius: "var(--radius-full)",
+                    }}>
                       Processing…
                     </span>
                   )}
                   {doc.status === "failed" && (
-                    <span className="text-label-md" style={{ color: "var(--color-error)" }}>
+                    <span className="text-label-md" style={{
+                      backgroundColor: "var(--color-error-container)",
+                      color: "var(--color-error)",
+                      padding: "4px 10px",
+                      borderRadius: "var(--radius-full)",
+                    }}>
                       Failed
                     </span>
                   )}
                   {doc.status === "unsupported" && (
-                    <span className="text-label-md" style={{ color: "var(--color-error)" }}>
+                    <span className="text-label-md" style={{
+                      backgroundColor: "var(--color-error-container)",
+                      color: "var(--color-error)",
+                      padding: "4px 10px",
+                      borderRadius: "var(--radius-full)",
+                    }}>
                       Unsupported
                     </span>
                   )}
                 </div>
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
-                <button
-                  onClick={(e) => handleDelete(e, doc.id)}
-                  style={{
-                    background: confirmDeleteId === doc.id ? "var(--color-error-container)" : "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: confirmDeleteId === doc.id ? "0.375rem 0.75rem" : "0.25rem",
-                    borderRadius: "var(--radius-input)",
-                    color: confirmDeleteId === doc.id ? "var(--color-error)" : "var(--color-error)",
-                    opacity: confirmDeleteId === doc.id ? 1 : 0.8,
-                    transition: "all 120ms ease",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.25rem"
-                  }}
-                  onMouseOver={(e) => (e.currentTarget.style.opacity = "1")}
-                  onMouseOut={(e) => (e.currentTarget.style.opacity = confirmDeleteId === doc.id ? "1" : "0.8")}
-                  title="Delete session"
-                >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="3 6 5 6 21 6"></polyline>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                    <line x1="10" y1="11" x2="10" y2="17"></line>
-                    <line x1="14" y1="11" x2="14" y2="17"></line>
-                  </svg>
-                  {confirmDeleteId === doc.id && (
-                    <span style={{ fontSize: "0.75rem", fontWeight: 600 }}>Confirm</span>
-                  )}
-                </button>
+                
                 {doc.status === "ready" && (
                   <span style={{
-                    fontFamily: "var(--font-label)", fontSize: "0.8125rem",
+                    fontFamily: "var(--font-label)", fontSize: "0.875rem",
                     fontWeight: 600, color: "var(--color-primary)",
                   }}>
                     {doc.concepts_covered > 0 ? "Continue →" : "Start →"}
                   </span>
                 )}
               </div>
+
+              {/* Progressive Disclosure (Hover only Delete Button) */}
+              <button
+                onClick={(e) => handleDelete(e, doc.id)}
+                className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                style={{
+                  position: "absolute",
+                  top: "1.25rem",
+                  right: "1.25rem",
+                  background: confirmDeleteId === doc.id ? "var(--color-error-container)" : "rgba(0,0,0,0.2)",
+                  backdropFilter: "blur(8px)",
+                  border: confirmDeleteId === doc.id ? "1px solid var(--color-error)" : "1px solid rgba(255,255,255,0.05)",
+                  cursor: "pointer",
+                  padding: confirmDeleteId === doc.id ? "0.375rem 0.75rem" : "0.375rem",
+                  borderRadius: "var(--radius-full)",
+                  color: "var(--color-error)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                  opacity: confirmDeleteId === doc.id ? 1 : undefined,
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.background = confirmDeleteId === doc.id ? "var(--color-error-container)" : "rgba(248, 113, 113, 0.2)";
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.background = confirmDeleteId === doc.id ? "var(--color-error-container)" : "rgba(0,0,0,0.2)";
+                }}
+                title="Delete session"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+                {confirmDeleteId === doc.id && (
+                  <span style={{ fontSize: "0.75rem", fontWeight: 600 }}>Confirm</span>
+                )}
+              </button>
             </div>
           ))}
         </div>

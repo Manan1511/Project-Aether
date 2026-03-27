@@ -5,6 +5,47 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import InsightsLoading from "./loading";
 
+function CircularProgress({ value, max, color, label }: { value: number, max: number, color: string, label: string }) {
+  const radius = 36;
+  const circumference = 2 * Math.PI * radius;
+  const percentage = max === 0 ? 0 : value / max;
+  const [offset, setOffset] = useState(circumference);
+
+  useEffect(() => {
+    // animate in
+    const timer = setTimeout(() => {
+      setOffset(circumference - percentage * circumference);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [percentage, circumference]);
+
+  return (
+    <div className="glass-card" style={{ display: "flex", flexDirection: "column", alignItems: "center", padding: "1.5rem" }}>
+      <div style={{ position: "relative", width: "96px", height: "96px", marginBottom: "1rem" }}>
+        <svg fill="none" viewBox="0 0 96 96" style={{ transform: "rotate(-90deg)", width: "100%", height: "100%" }}>
+          <circle cx="48" cy="48" r={radius} stroke="var(--color-outline-variant)" strokeWidth="8" />
+          <circle
+            cx="48" cy="48" r={radius} stroke={color} strokeWidth="8"
+            strokeDasharray={circumference} strokeDashoffset={offset}
+            strokeLinecap="round"
+            style={{ transition: "stroke-dashoffset 1.5s cubic-bezier(0.16, 1, 0.3, 1)" }}
+          />
+        </svg>
+        <div style={{
+          position: "absolute", top: 0, left: 0, width: "100%", height: "100%",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          fontFamily: "var(--font-headline)", fontSize: "1.75rem", fontWeight: 700, color: "var(--color-on-surface)"
+        }}>
+          {value}
+        </div>
+      </div>
+      <div className="text-label-md" style={{ color: "var(--color-on-surface-variant)" }}>
+        {label}
+      </div>
+    </div>
+  );
+}
+
 interface ConceptInsight {
   label: string;
   confidence_state: string;
@@ -71,43 +112,14 @@ export default function InsightsPage() {
       </h1>
 
       {/* Summary cards */}
+      {/* Summary cards */}
       <div style={{
-        display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
-        gap: "0.75rem", marginBottom: "2rem",
+        display: "grid", gridTemplateColumns: "repeat(3, 1fr)",
+        gap: "1.25rem", marginBottom: "2.5rem",
       }}>
-        <div className="aether-card" style={{ textAlign: "center", padding: "1.25rem" }}>
-          <div style={{
-            fontFamily: "var(--font-headline)", fontSize: "2rem", fontWeight: 700,
-            color: "var(--color-primary-bright)",
-          }}>
-            {counts.high}
-          </div>
-          <div className="text-label-md" style={{ color: "var(--color-on-surface-variant)", marginTop: "0.25rem" }}>
-            Strong
-          </div>
-        </div>
-        <div className="aether-card" style={{ textAlign: "center", padding: "1.25rem" }}>
-          <div style={{
-            fontFamily: "var(--font-headline)", fontSize: "2rem", fontWeight: 700,
-            color: "var(--color-secondary)",
-          }}>
-            {counts.medium}
-          </div>
-          <div className="text-label-md" style={{ color: "var(--color-on-surface-variant)", marginTop: "0.25rem" }}>
-            Developing
-          </div>
-        </div>
-        <div className="aether-card" style={{ textAlign: "center", padding: "1.25rem" }}>
-          <div style={{
-            fontFamily: "var(--font-headline)", fontSize: "2rem", fontWeight: 700,
-            color: "var(--color-error)",
-          }}>
-            {counts.low}
-          </div>
-          <div className="text-label-md" style={{ color: "var(--color-on-surface-variant)", marginTop: "0.25rem" }}>
-            Needs review
-          </div>
-        </div>
+        <CircularProgress value={counts.high} max={insights.length} color="var(--color-success)" label="Strong" />
+        <CircularProgress value={counts.medium} max={insights.length} color="var(--color-primary-bright)" label="Developing" />
+        <CircularProgress value={counts.low} max={insights.length} color="var(--color-error)" label="Needs review" />
       </div>
 
       {/* Filter */}
@@ -141,7 +153,7 @@ export default function InsightsPage() {
           {filtered.map((insight, i) => (
             <div
               key={i}
-              className="aether-card"
+              className="glass-card"
               style={{
                 display: "flex", justifyContent: "space-between",
                 alignItems: "center", padding: "1rem 1.25rem",

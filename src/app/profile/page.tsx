@@ -20,12 +20,7 @@ interface UserPrefs {
   read_aloud_default: string;
 }
 
-function formatTime(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  if (hours > 0) return `${hours}h ${minutes}m`;
-  return `${minutes}m`;
-}
+
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -34,7 +29,6 @@ export default function ProfilePage() {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [prefs, setPrefs] = useState<UserPrefs | null>(null);
   const [email, setEmail] = useState("");
-  const [showSettings, setShowSettings] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -71,7 +65,16 @@ export default function ProfilePage() {
     const html = document.documentElement;
     if (field === "theme") html.classList.toggle("theme-light", value === "light");
     if (field === "font") html.classList.toggle("font-dyslexic", value === "opendyslexic");
-    if (field === "letter_spacing") html.classList.toggle("spacing-wide", value === "wide");
+    if (field === "letter_spacing") {
+      const v = parseFloat(value as string);
+      if (!isNaN(v)) {
+        html.style.setProperty("--global-letter-spacing", `${(v - 1.0) * 0.1}em`);
+      } else if (value === "wide") {
+        html.style.setProperty("--global-letter-spacing", "0.05em");
+      } else {
+        html.style.setProperty("--global-letter-spacing", "normal");
+      }
+    }
   }, [supabase]);
 
   const handleLogout = useCallback(async () => {
@@ -84,99 +87,84 @@ export default function ProfilePage() {
 
   return (
     <div style={{
-      maxWidth: "600px", margin: "0 auto", padding: "2rem",
+      maxWidth: "680px", margin: "0 auto", padding: "2rem",
       minHeight: "calc(100dvh - 5rem)",
     }}>
       {/* Header */}
       <div style={{
         display: "flex", justifyContent: "space-between", alignItems: "center",
-        marginBottom: "2rem",
+        marginBottom: "3rem",
       }}>
-        <h1 className="text-headline-md">Profile</h1>
-        <button
-          id="settings-toggle"
-          className="btn-tertiary"
-          onClick={() => setShowSettings(!showSettings)}
-          style={{ fontSize: "1.25rem" }}
-        >
-          ⚙
-        </button>
+        <h1 style={{ fontFamily: "var(--font-headline)", fontSize: "1.25rem", fontWeight: 600, letterSpacing: "-0.02em" }}>Aether</h1>
       </div>
 
       {/* User info */}
-      <div className="aether-card" style={{ marginBottom: "1.5rem" }}>
-        <div style={{
-          width: "56px", height: "56px", borderRadius: "50%",
-          backgroundColor: "var(--color-primary-container)",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          marginBottom: "1rem",
-          fontFamily: "var(--font-headline)", fontSize: "1.25rem",
-          fontWeight: 600, color: "var(--color-primary)",
-        }}>
-          {email.charAt(0).toUpperCase()}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "3rem" }}>
+        <div style={{ position: "relative" }}>
+          <div style={{
+            width: "96px", height: "96px", borderRadius: "50%",
+            backgroundColor: "var(--color-surface)",
+            border: "1px solid var(--color-primary-bright)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            fontFamily: "var(--font-headline)", fontSize: "2rem",
+            fontWeight: 400, color: "var(--color-on-surface)",
+            boxShadow: "0 0 24px -10px rgba(129, 140, 248, 0.4)",
+          }}>
+            {email.charAt(0).toUpperCase()}
+          </div>
+          <div style={{
+            position: "absolute", bottom: "0", right: "0",
+            width: "28px", height: "28px", borderRadius: "50%",
+            backgroundColor: "var(--color-surface-variant)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            border: "2px solid var(--color-surface)",
+          }}>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary-dim)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
         </div>
-        <p className="text-body-lg" style={{ fontWeight: 500 }}>{email}</p>
+        <h2 style={{ fontFamily: "var(--font-headline)", fontSize: "1.375rem", marginTop: "1rem", fontWeight: 400 }}>Jhanvi Vashishth</h2>
+        <p style={{ fontFamily: "var(--font-body)", fontSize: "0.875rem", color: "var(--color-secondary-text)", fontWeight: 300, letterSpacing: "0.02em" }}>{email}</p>
       </div>
 
       {/* Stats */}
       {stats && (
         <div style={{
-          display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "0.75rem",
-          marginBottom: "1.5rem",
+          display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1.25rem",
+          marginBottom: "3rem",
         }}>
-          <div className="aether-card" style={{ textAlign: "center", padding: "1.25rem" }}>
-            <div style={{
-              fontFamily: "var(--font-headline)", fontSize: "1.75rem",
-              fontWeight: 700, color: "var(--color-primary-bright)",
-            }}>
-              {stats.concepts_covered}
-            </div>
-            <div className="text-label-md" style={{
-              color: "var(--color-on-surface-variant)", marginTop: "0.25rem",
-            }}>
-              Concepts
+          <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "110px", padding: "1.25rem" }}>
+            <div className="text-label-md" style={{ color: "var(--color-secondary-text)", fontSize: "0.625rem", letterSpacing: "0.1em" }}>CONCEPTS</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem" }}>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "1.75rem", fontWeight: 300, color: "var(--color-primary-dim)" }}>{stats.concepts_covered}</span>
+              <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", color: "var(--color-secondary-text)", fontWeight: 500 }}>active</span>
             </div>
           </div>
-
-          <div className="aether-card" style={{ textAlign: "center", padding: "1.25rem" }}>
-            <div style={{
-              fontFamily: "var(--font-headline)", fontSize: "1.75rem",
-              fontWeight: 700, color: "var(--color-primary-bright)",
-            }}>
-              {formatTime(stats.total_session_seconds)}
-            </div>
-            <div className="text-label-md" style={{
-              color: "var(--color-on-surface-variant)", marginTop: "0.25rem",
-            }}>
-              Time with Aether
+          
+          <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "110px", padding: "1.25rem" }}>
+            <div className="text-label-md" style={{ color: "var(--color-secondary-text)", fontSize: "0.625rem", letterSpacing: "0.1em" }}>TIME WITH AETHER</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem" }}>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "1.75rem", fontWeight: 300, color: "var(--color-primary-dim)" }}>{Math.floor(stats.total_session_seconds / 60)}</span>
+              <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", color: "var(--color-secondary-text)", fontWeight: 500 }}>mins</span>
             </div>
           </div>
-
-          <div className="aether-card" style={{ textAlign: "center", padding: "1.25rem" }}>
-            <div style={{
-              fontFamily: "var(--font-headline)", fontSize: "1.75rem",
-              fontWeight: 700, color: "var(--color-primary-bright)",
-            }}>
-              {stats.documents_studied}
-            </div>
-            <div className="text-label-md" style={{
-              color: "var(--color-on-surface-variant)", marginTop: "0.25rem",
-            }}>
-              Documents
+          
+          <div className="glass-card" style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", minHeight: "110px", padding: "1.25rem" }}>
+            <div className="text-label-md" style={{ color: "var(--color-secondary-text)", fontSize: "0.625rem", letterSpacing: "0.1em" }}>DOCUMENTS</div>
+            <div style={{ display: "flex", alignItems: "baseline", gap: "0.25rem" }}>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "1.75rem", fontWeight: 300, color: "var(--color-primary-dim)" }}>{stats.documents_studied}</span>
+              <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", color: "var(--color-secondary-text)", fontWeight: 500 }}>stored</span>
             </div>
           </div>
         </div>
       )}
 
-      {/* Settings Panel */}
-      {showSettings && prefs && (
-        <div style={{
-          opacity: showSettings ? 1 : 0,
-          transition: "opacity 120ms ease",
-        }}>
-          <h2 className="text-title-lg" style={{ marginBottom: "1.25rem" }}>Settings</h2>
+      {/* Settings Form Flattened */}
+      {prefs && (
+        <div style={{ paddingBottom: "3rem" }}>
+          <div className="text-label-md" style={{ color: "var(--color-secondary-text)", letterSpacing: "0.1em", marginBottom: "0.5rem" }}>
+            INTERFACE PREFERENCE
+          </div>
 
-          {/* Theme */}
           <SettingRow label="Theme">
             <SegmentedControl
               options={[
@@ -188,76 +176,107 @@ export default function ProfilePage() {
             />
           </SettingRow>
 
-          {/* Font */}
-          <SettingRow label="Font">
+          <SettingRow label="Font Family">
             <SegmentedControl
               options={[
-                { label: "Lexend", value: "inter" },
+                { label: "Lexend", value: "lexend" },
                 { label: "OpenDyslexic", value: "opendyslexic" },
               ]}
-              selected={prefs.font}
+              selected={prefs.font || "lexend"}
               onChange={(v) => updatePref("font", v)}
             />
           </SettingRow>
 
-          {/* Spacing */}
-          <SettingRow label="Letter spacing">
-            <SegmentedControl
-              options={[
-                { label: "Normal", value: "normal" },
-                { label: "Wide", value: "wide" },
-              ]}
-              selected={prefs.letter_spacing}
-              onChange={(v) => updatePref("letter_spacing", v)}
-            />
+          <SettingRow label="Letter Spacing">
+            <div style={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "flex-end", gap: "1rem" }}>
+              <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", fontWeight: 600, color: "var(--color-primary-bright)" }}>
+                {prefs.letter_spacing === "wide" ? "1.5x" : prefs.letter_spacing === "normal" ? "1.0x" : `${parseFloat(prefs.letter_spacing || "1.0").toFixed(1)}x`}
+              </span>
+            </div>
           </SettingRow>
-
-          {/* Session length */}
-          <SettingRow label="Session length">
-            <SegmentedControl
-              options={[
-                { label: "5", value: "5" },
-                { label: "7", value: "7" },
-                { label: "10", value: "10" },
-                { label: "15", value: "15" },
-              ]}
-              selected={String(prefs.session_length)}
-              onChange={(v) => updatePref("session_length", parseInt(v))}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "1rem" }}>
+            <input 
+              type="range" 
+              className="aether-slider" 
+              min="1" max="2" step="0.5" 
+              value={prefs.letter_spacing === "wide" ? 1.5 : (prefs.letter_spacing === "normal" || !prefs.letter_spacing) ? 1.0 : parseFloat(prefs.letter_spacing)} 
+              onChange={(e) => updatePref("letter_spacing", e.target.value)} 
+              style={{ width: "100%" }} 
             />
-          </SettingRow>
+            <div style={{ display: "flex", justifyContent: "space-between", width: "100%", padding: "0 4px", marginTop: "8px" }}>
+              <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>1.0x (Normal)</span>
+              <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>1.5x (Wide)</span>
+              <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>2.0x (Max)</span>
+            </div>
+          </div>
 
-          {/* Audio default */}
-          <SettingRow label="Read aloud">
-            <SegmentedControl
-              options={[
-                { label: "Always", value: "always" },
-                { label: "Sometimes", value: "sometimes" },
-                { label: "Never", value: "never" },
-              ]}
-              selected={prefs.read_aloud_default}
-              onChange={(v) => updatePref("read_aloud_default", v)}
-            />
-          </SettingRow>
+          <div className="text-label-md" style={{ marginTop: "3rem", marginBottom: "0.5rem", color: "var(--color-secondary-text)", letterSpacing: "0.1em" }}>
+            READING &amp; FOCUS
+          </div>
 
-          {/* Audio speed */}
-          <SettingRow label="Audio speed">
-            <SegmentedControl
-              options={[
-                { label: "0.75×", value: "0.75" },
-                { label: "1×", value: "1" },
-                { label: "1.25×", value: "1.25" },
-              ]}
-              selected={String(prefs.audio_speed)}
-              onChange={(v) => updatePref("audio_speed", parseFloat(v))}
-            />
+          <SettingRow label="Session Length (mins)">
+            <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", fontWeight: 600, color: "var(--color-primary-bright)" }}>{prefs.session_length} mins</span>
           </SettingRow>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "1rem" }}>
+             <input type="range" className="aether-slider" min="5" max="30" step="5" value={prefs.session_length} onChange={(e) => updatePref("session_length", parseInt(e.target.value))} style={{ width: "100%" }} />
+             <div style={{ display: "flex", justifyContent: "space-between", width: "100%", padding: "0 4px", marginTop: "8px" }}>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>5m</span>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>15m</span>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>30m</span>
+             </div>
+          </div>
 
-          <div style={{ marginTop: "2rem" }}>
+          <SettingRow label="Read Aloud Volume">
+            <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", fontWeight: 600, color: "var(--color-primary-container)" }}>73%</span>
+          </SettingRow>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "1rem" }}>
+             <input type="range" className="aether-slider" min="0" max="100" step="50" defaultValue="73" style={{ width: "100%", opacity: 0.5 }} disabled />
+             <div style={{ display: "flex", justifyContent: "space-between", width: "100%", padding: "0 4px", marginTop: "8px", opacity: 0.5 }}>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>0%</span>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>50%</span>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>100%</span>
+             </div>
+          </div>
+
+          <SettingRow label="Audio Speed">
+             <span style={{ fontFamily: "var(--font-label)", fontSize: "0.75rem", fontWeight: 600, color: "var(--color-primary-bright)" }}>{prefs.audio_speed.toFixed(1)}x</span>
+          </SettingRow>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "2rem" }}>
+             <input type="range" className="aether-slider" min="0.5" max="2" step="0.5" value={prefs.audio_speed} onChange={(e) => updatePref("audio_speed", parseFloat(e.target.value))} style={{ width: "100%" }} />
+             <div style={{ display: "flex", justifyContent: "space-between", width: "100%", padding: "0 4px", marginTop: "8px" }}>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>0.5x</span>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)", paddingLeft: "5%" }}>1.0x</span>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)", paddingRight: "5%" }}>1.5x</span>
+               <span style={{ fontSize: "0.625rem", color: "var(--color-secondary-text)", fontFamily: "var(--font-label)" }}>2.0x</span>
+             </div>
+          </div>
+
+          <div style={{ marginTop: "3rem" }}>
             <button
-              className="btn-secondary"
               onClick={handleLogout}
-              style={{ width: "100%", color: "var(--color-error)" }}
+              style={{
+                width: "100%",
+                padding: "1rem",
+                borderRadius: "16px",
+                border: "none",
+                background: "rgba(225, 29, 72, 0.1)",
+                color: "#FB7185",
+                fontFamily: "var(--font-headline)",
+                fontSize: "1rem",
+                fontWeight: 600,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.5rem",
+                transition: "opacity 120ms ease"
+              }}
+              onMouseOver={(e) => (e.currentTarget.style.opacity = "0.8")}
+              onMouseOut={(e) => (e.currentTarget.style.opacity = "1")}
             >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
               Sign out
             </button>
           </div>
@@ -273,10 +292,10 @@ function SettingRow({ label, children }: { label: string; children: React.ReactN
   return (
     <div style={{
       display: "flex", justifyContent: "space-between", alignItems: "center",
-      padding: "1rem 0",
-      borderBottom: "1px solid rgba(72, 72, 72, 0.15)",
+      paddingTop: "1.5rem", paddingBottom: "0.5rem",
+      borderBottom: "1px solid rgba(255, 255, 255, 0)",
     }}>
-      <span className="text-body-lg" style={{ fontWeight: 500 }}>{label}</span>
+      <span style={{ fontFamily: "var(--font-headline)", fontSize: "0.875rem", color: "var(--color-on-surface-variant)" }}>{label}</span>
       {children}
     </div>
   );
@@ -293,18 +312,18 @@ function SegmentedControl({
 }) {
   return (
     <div style={{
-      display: "flex", gap: "4px",
-      backgroundColor: "var(--color-surface-container)",
-      borderRadius: "var(--radius-input)",
-      padding: "3px",
+      display: "flex", gap: "2px",
+      backgroundColor: "rgba(255, 255, 255, 0.05)",
+      borderRadius: "99px",
+      padding: "4px",
     }}>
       {options.map((opt) => (
         <button
           key={opt.value}
           onClick={() => onChange(opt.value)}
           style={{
-            padding: "0.4rem 0.75rem",
-            borderRadius: "7px",
+            padding: "0.375rem 1rem",
+            borderRadius: "99px",
             border: "none",
             cursor: "pointer",
             backgroundColor: selected === opt.value
@@ -312,11 +331,13 @@ function SegmentedControl({
               : "transparent",
             color: selected === opt.value
               ? "var(--color-on-primary)"
-              : "var(--color-on-surface-variant)",
+              : "var(--color-secondary-text)",
             fontFamily: "var(--font-label)",
-            fontSize: "0.75rem",
-            fontWeight: 600,
-            transition: "all 120ms ease",
+            fontSize: "0.625rem",
+            textTransform: "uppercase",
+            letterSpacing: "0.1em",
+            fontWeight: 700,
+            transition: "all 200ms ease",
           }}
         >
           {opt.label}

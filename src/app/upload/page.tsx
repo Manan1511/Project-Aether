@@ -18,7 +18,6 @@ export default function UploadPage() {
     "idle" | "extracting" | "uploading" | "processing" | "error" | "unsupported"
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [progress, setProgress] = useState("");
 
   const handleFile = useCallback(
     async (selectedFile: File) => {
@@ -38,7 +37,6 @@ export default function UploadPage() {
 
       setFile(selectedFile);
       setStatus("extracting");
-      setProgress("Extracting text from PDF…");
       setErrorMessage(null);
 
       try {
@@ -77,7 +75,6 @@ export default function UploadPage() {
         const fileHash = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
 
         setStatus("uploading");
-        setProgress("Uploading to your library…");
 
         const {
           data: { user },
@@ -128,7 +125,6 @@ export default function UploadPage() {
         if (dbError) throw dbError;
 
         setStatus("processing");
-        setProgress("AI is analysing your document…");
 
         // Call the ingest API
         const response = await fetch("/api/ingest", {
@@ -223,7 +219,6 @@ export default function UploadPage() {
           Drop a PDF and Aether will build your course
         </p>
 
-        {/* Drop zone */}
         <button
           id="upload-drop-zone"
           onClick={() => fileInputRef.current?.click()}
@@ -231,39 +226,52 @@ export default function UploadPage() {
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           disabled={isProcessing}
+          className="glass-panel"
           style={{
+            position: "relative",
             width: "100%",
-            minHeight: "240px",
+            minHeight: "260px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            gap: "1rem",
+            gap: "1.25rem",
             padding: "2rem",
+            overflow: "hidden",
             backgroundColor: isDragging
-              ? "var(--color-primary-container)"
-              : "var(--color-surface-container)",
-            border: `2px dashed ${
+              ? "rgba(129, 140, 248, 0.08)"
+              : "rgba(255, 255, 255, 0.02)",
+            boxShadow: isDragging 
+              ? "0 0 40px -10px rgba(129, 140, 248, 0.5), inset 0 0 20px rgba(129, 140, 248, 0.1)" 
+              : "0 8px 32px -4px rgba(0, 0, 0, 0.1)",
+            border: `1px solid ${
               isDragging
-                ? "var(--color-primary)"
+                ? "rgba(129, 140, 248, 0.6)"
                 : status === "error" || status === "unsupported"
                 ? "var(--color-error)"
-                : "var(--color-outline-variant)"
+                : "rgba(255, 255, 255, 0.08)"
             }`,
-            borderRadius: "var(--radius-card)",
             cursor: isProcessing ? "wait" : "pointer",
-            transition: "all 120ms ease",
-            textAlign: "center",
           }}
         >
+          {isProcessing && (
+            <div style={{
+              position: "absolute", top: 0, left: 0, width: "100%", height: "2px",
+              backgroundColor: "rgba(255, 255, 255, 0.05)", zIndex: 10
+            }}>
+              <div className="progress-slide" style={{
+                height: "100%", backgroundColor: "var(--color-primary)",
+              }} />
+            </div>
+          )}
+
           {isProcessing ? (
             <>
-              <div className="aether-loading" style={{ width: "48px", height: "48px" }} />
               <p
                 className="text-body-lg"
-                style={{ color: "var(--color-on-surface-variant)" }}
+                style={{ color: "var(--color-on-surface)" }}
               >
-                {progress}
+                Processing document…
               </p>
               {file && (
                 <p

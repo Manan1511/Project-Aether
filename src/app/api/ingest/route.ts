@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       throw new Error(
         `RAG backend is unreachable (${RAG_BACKEND_URL}). ` +
           `Make sure the Python server is running: cd backend && uvicorn main:app --reload. ` +
-          `Original error: ${message} (Cause: ${fetchErr?.cause?.message || "unknown"})`
+          `Original error: ${message} (Cause: ${(fetchErr as { cause?: { message?: string } })?.cause?.message || "unknown"})`
       );
     }
 

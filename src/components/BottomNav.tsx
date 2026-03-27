@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
 
-const ICON_SIZE = 24;
+const ICON_SIZE = 28;
 
 function LibraryIcon({ active }: { active: boolean }) {
   return (
-    <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke={active ? "var(--color-primary)" : "var(--color-secondary-text)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke={active ? "var(--color-primary)" : "var(--color-secondary-text)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
       <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
     </svg>
@@ -16,7 +17,7 @@ function LibraryIcon({ active }: { active: boolean }) {
 
 function UploadIcon({ active }: { active: boolean }) {
   return (
-    <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke={active ? "var(--color-primary)" : "var(--color-secondary-text)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke={active ? "var(--color-primary)" : "var(--color-secondary-text)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
       <polyline points="17 8 12 3 7 8" />
       <line x1="12" y1="3" x2="12" y2="15" />
@@ -26,7 +27,7 @@ function UploadIcon({ active }: { active: boolean }) {
 
 function InsightsIcon({ active }: { active: boolean }) {
   return (
-    <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke={active ? "var(--color-primary)" : "var(--color-secondary-text)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke={active ? "var(--color-primary)" : "var(--color-secondary-text)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <line x1="18" y1="20" x2="18" y2="10" />
       <line x1="12" y1="20" x2="12" y2="4" />
       <line x1="6" y1="20" x2="6" y2="14" />
@@ -36,7 +37,7 @@ function InsightsIcon({ active }: { active: boolean }) {
 
 function ProfileIcon({ active }: { active: boolean }) {
   return (
-    <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke={active ? "var(--color-primary)" : "var(--color-secondary-text)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width={ICON_SIZE} height={ICON_SIZE} viewBox="0 0 24 24" fill="none" stroke={active ? "var(--color-primary)" : "var(--color-secondary-text)"} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
       <circle cx="12" cy="7" r="4" />
     </svg>
@@ -85,7 +86,7 @@ export default function BottomNav() {
           display: "flex",
           justifyContent: "space-around",
           alignItems: "center",
-          height: "64px",
+          height: "72px",
           maxWidth: "600px",
           margin: "0 auto",
         }}
@@ -95,41 +96,46 @@ export default function BottomNav() {
           const IconComponent = ICON_MAP[tab.id];
 
           return (
-            <Link
+            <motion.div
               key={tab.id}
-              href={tab.path}
-              prefetch={true}
-              id={`nav-${tab.id}`}
-              aria-label={tab.label}
-              aria-current={isActive ? "page" : undefined}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: "4px",
-                padding: "8px 12px",
-                background: "none",
-                textDecoration: "none",
-                transition: "opacity 120ms ease",
-                minWidth: "60px",
-              }}
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ y: -2 }}
             >
-              <IconComponent active={isActive} />
-              {isActive && (
-                <span
-                  style={{
-                    fontFamily: "var(--font-label)",
-                    fontSize: "0.625rem",
-                    fontWeight: 600,
-                    color: "var(--color-primary)",
-                    textTransform: "uppercase",
-                    letterSpacing: "0.08em",
-                  }}
-                >
-                  {tab.label}
-                </span>
-              )}
-            </Link>
+              <Link
+                href={tab.path}
+                prefetch={true}
+                id={`nav-${tab.id}`}
+                aria-label={tab.label}
+                aria-current={isActive ? "page" : undefined}
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "8px 12px",
+                  background: "none",
+                  textDecoration: "none",
+                  transition: "opacity 120ms ease",
+                  minWidth: "60px",
+                }}
+              >
+                <IconComponent active={isActive} />
+                {isActive && (
+                  <span
+                    style={{
+                      fontFamily: "var(--font-label)",
+                      fontSize: "0.625rem",
+                      fontWeight: 600,
+                      color: "var(--color-primary)",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.08em",
+                    }}
+                  >
+                    {tab.label}
+                  </span>
+                )}
+              </Link>
+            </motion.div>
           );
         })}
       </div>

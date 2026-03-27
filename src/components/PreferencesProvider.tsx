@@ -25,44 +25,58 @@ export default function PreferencesProvider({
     }
 
     async function loadPreferences() {
-      const supabase = createClient();
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      try {
+        const supabase = createClient();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
 
-      if (!session) {
-        hasFetched.current = true;
-        setLoaded(true);
-        return;
-      }
-
-      const { data: prefs } = await supabase
-        .from("user_preferences")
-        .select("theme, font, letter_spacing, onboarding_complete")
-        .eq("user_id", session.user.id)
-        .single();
-
-      if (prefs) {
-        // Check onboarding — redirect if not complete
-        if (
-          !prefs.onboarding_complete &&
-          !pathname.startsWith("/onboarding") &&
-          !pathname.startsWith("/auth")
-        ) {
-          router.replace("/onboarding");
+        if (!session) {
           hasFetched.current = true;
           setLoaded(true);
           return;
         }
 
-        const html = document.documentElement;
-        html.classList.toggle("theme-light", prefs.theme === "light");
-        html.classList.toggle("font-dyslexic", prefs.font === "opendyslexic");
-        html.classList.toggle("spacing-wide", prefs.letter_spacing === "wide");
-      }
+        const { data: prefs } = await supabase
+          .from("user_preferences")
+          .select("theme, font, letter_spacing, onboarding_complete")
+          .eq("user_id", session.user.id)
+          .single();
 
-      hasFetched.current = true;
-      setLoaded(true);
+        if (prefs) {
+          // Check onboarding — redirect if not complete
+          if (
+            !prefs.onboarding_complete &&
+            !pathname.startsWith("/onboarding") &&
+            !pathname.startsWith("/auth")
+          ) {
+            router.replace("/onboarding");
+            hasFetched.current = true;
+            setLoaded(true);
+            return;
+          }
+
+          const html = document.documentElement;
+          html.classList.toggle("theme-light", prefs.theme === "light");
+          html.classList.toggle("font-dyslexic", prefs.font === "opendyslexic");
+
+          if (prefs.letter_spacing === "wide") {
+            html.style.setProperty("--global-letter-spacing", "0.05em");
+          } else if (prefs.letter_spacing === "normal" || !prefs.letter_spacing) {
+            html.style.setProperty("--global-letter-spacing", "normal");
+          } else {
+            const v = parseFloat(prefs.letter_spacing);
+            if (!isNaN(v)) {
+              html.style.setProperty("--global-letter-spacing", `${(v - 1.0) * 0.1}em`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load preferences:", error);
+      } finally {
+        hasFetched.current = true;
+        setLoaded(true);
+      }
     }
 
     loadPreferences();
